@@ -20,7 +20,7 @@ Posiadamy maksymalnie 10000 lotów opisanych czasami wylotu i przylotu. Celem na
 * Dane wejściowe są przyjmowane za poprawne.
 
 ## Opis algorytmu
-Na początku sortujemy dane według rosnących godzin wylotów. Następnie, generujemy graf skierowany ważony. Wierzchołek startowy: 0, połączony jest ze wszystkimi lotami. Każdy lot połączony jest z każdym możliwym następnym lotem - przylot lotu poprzedniego <= wylot lotu następnego. Krawędzie wychodzące z wierzchołkamają wagi odpowiadające długości lotu tego wierzchołka. Ostatni wierzołek jest punktem końcowym porządkowania - minuta: 30.000, do którego wchodzą krawędzie z wierzchołków każdego z lotów. Następnie wyszukujemy ścieżkę o największym koszcie w grafie - największy sumaryczny czas w powietrzu.
+Na początku sortujemy dane według rosnących godzin wylotów. Następnie, generujemy graf skierowany ważony. Wierzchołek startowy: 0, połączony jest ze wszystkimi lotami. Każdy lot połączony jest z każdym możliwym następnym lotem - przylot lotu poprzedniego <= wylot lotu następnego. Krawędzie wychodzące z wierzchołka mają wagi odpowiadające długości lotu tego wierzchołka. Ostatni wierzchołek jest punktem końcowym porządkowania - minuta: 30.000, do którego wchodzą krawędzie z wierzchołków każdego z lotów. Następnie wyszukujemy ścieżkę o największym koszcie w grafie - największy sumaryczny czas w powietrzu.
 
 ![Przykładowy graf](https://codimd.s3.shivering-isles.com/demo/uploads/upload_13ea6cff1295fc308ec3aca6fea71a18.png)
 
@@ -45,7 +45,7 @@ Danymi wejściowymi jest lista par liczb naturalnych w pliku .txt.
 ```
 ### Generacja danych
 Generujemy maksymalnie 10 000 lotów sprawdzając tylko czy godzina wylotu jest wcześniejsza od godziny przylotu.
-W zależności od potrzeb zmieniane będą paramtery generacji, np. generacja lotu o maksymalnej długości lub lotów o długości 1 minuty, w celu sprawdzenia przypadków skrajnych.
+W zależności od potrzeb zmieniane będą parametry generacji, np. generacja lotu o maksymalnej długości lub lotów o długości 1 minuty, w celu sprawdzenia przypadków skrajnych.
 
 ## Dane wynikowe
 Lista kolejnych lotów, łączny czas w powietrzu, czas działania algorytmu.
