@@ -10,7 +10,7 @@ def generate_problem_data(size = 10000):
     """
     a_list = []
     for num in range(size):
-        departure = random.randint(1, 29999)
+        departure = random.randint(0, 29999)
         arrival = random.randint(departure+1, 30000)
         a_list.append([departure, arrival])
     return a_list
@@ -28,11 +28,11 @@ def generate_special_problem_data(size=10000, is_short = True):
     a_list = []
     if is_short is True:
         for num in range(size):
-            departure = random.randint(1, 29999)
+            departure = random.randint(0, 29999)
             a_list.append([departure, departure+1])
     else:
         for num in range(size):
-            a_list.append([1, 30000])
+            a_list.append([0, 30000])
     return a_list
 
 def generate_problem_instances(k=10, n=100, step=50, r=1):
