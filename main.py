@@ -2,118 +2,37 @@ import random
 import sys
 import graph
 import time
+import generator
+import argparse
+from beautifultable import BeautifulTable
 
 
-def generate_problem_data(size=10000):
-    """
-    Function generates list of flights of given size.
-
-    :param size: amount of data to be generated
-    :return: list with generated data
-    """
-    a_list = []
-    for num in range(size):
-        departure = random.randint(0, 29999)
-        arrival = random.randint(departure + 1, 30000)
-        a_list.append([departure, arrival])
-    return a_list
+class UnspecifiedArgumentException(Exception):
+    def __init__(self, message='Not all needed arguments are specified'):
+        super(UnspecifiedArgumentException, self).__init__(message)
 
 
-def generate_special_problem_data(size=10000, is_short=True):
-    """
-    Function generates special set of data of given size :
-    is_short = True, then flights have length of 1
-    is_short = False, then flights have length of 30,000
-
-    :param size: amount of data to be generated
-    :param is_short: flag showing if flight should be extremely short or long
-    :return: list with generated data
-    """
-    a_list = []
-    if is_short is True:
-        for num in range(size):
-            departure = random.randint(0, 29999)
-            a_list.append([departure, departure + 1])
-    else:
-        for num in range(size):
-            a_list.append([0, 30000])
-    return a_list
-
-
-def generate_problem_instances(k=10, n=100, step=50, r=1):
-    """
-    Function generates r instances of k problems, each problem has n+k*step flights.
-
-    :param k: number of problems to solve
-    :param n: number of generated data for 1st problem
-    :param step: number of how many flights more are generated with each new problem
-    :param r: number of problems of same size
-    :return: list of lists with random data for problem solver
-    """
-    list_of_lists = []
-    for i in range(k):
-        for j in range(r):
-            # sublist = []
-            sublist = generate_problem_data(n + i * step)
-            list_of_lists.append(sublist)
-    return list_of_lists
-
-
-def read_data_from_file(path="data.txt"):
-    """
-    Function reads flights from .txt file.
-
-    :param path: path to file with problem data
-    :return: list with problem data
-    """
-    try:
-        file = open(path, "r")
-    except Exception as e:
-        print(e)
-        return None
-    lines = file.readlines()
-    a_list = []
-    for line in lines:
-        string = (line.replace(" ", "")).split()
-        for s in string:
-            departure = int(s.split(',')[0])
-            arrival = int(s.split(',')[1])
-            if departure < arrival and departure >= 0 and departure < 30000 and arrival >= 1 and arrival <= 30000:
-                a_list.append([departure, arrival])
-    file.close()
-    return a_list
-
-
-def write_data_to_file(a_list, path="data.txt"):
-    """
-    Function writes given list to .txt file.
-
-    :param a_list: list of flights
-    :param path: file path
-    :return: None
-    """
-    file = open(path, "w")
-    for l in a_list:
-        file.write("{},{}\n".format(l[0], l[1]))
-    return None
-
-
-def write_solution_to_file(a_list, total_time_in_air, total_time, path="result.txt"):
+def write_solution_to_file(a_list, total_time_in_air, time_data, path="result.txt"):
     """
     Function writes solution of 1 problem to .txt file.
 
     :param a_list: solution of problem
     :param total_time_in_air: sum of all flight times
-    :param total_time: total calculation time
+    :param time_data: full data about calculation time
     :param path: file path
     :return: None
     """
     file = open(path, "w")
     file.write(
-        "Total time in air: {}\nTotal time of calculating solution: {}\nFlights in order: \n".format(total_time_in_air,
-                                                                                                     total_time))
-    for l in a_list:
-        file.write("{},{}\n".format(l[0], l[1]))
+        f"Total time in air: {total_time_in_air}\nTotal time of calculating solution: {time_data[9] - time_data[0]}\n")
+    file.write('Problem generation duration ' + str(time_data[1] - time_data[0]) + '\n')
+    file.write('Add vertices to graph duration ' + str(time_data[3] - time_data[2]) + '\n')
+    file.write('Add edges duration ' + str(time_data[5] - time_data[4]) + '\n')
+    file.write('Topological sort duration ' + str(time_data[7] - time_data[6]) + '\n')
+    file.write('Path sort duration ' + str(time_data[9] - time_data[8]) + '\nFlights in order: \n')
+    for elem in a_list:
+        file.write("{},{}\n".format(elem[0], elem[1]))
+    file.close()
     return None
 
 
@@ -123,76 +42,198 @@ def read_passed_arguments():
 
     :return: list of arguments
     """
-    print('Number of arguments:', len(sys.argv), 'arguments.')
-    print('Argument List:', str(sys.argv))
-    if len(sys.argv[1]) != 3:
-        print("Mod flag not included as first flag: -m<1,2,3>")
-        return None
-    program_mode = int(sys.argv[1][2])
-    if program_mode == 2:
+    parser = argparse.ArgumentParser(description="generate and solve max airtime problem")
+    group = parser.add_mutually_exclusive_group()
+    parser.add_argument("-m", "--mode", type=int, choices=[1, 2, 3], required=True, help="choose program mode: 1, 2 or 3")
+    group.add_argument("-n", "--number", type=int, help="choose how many flights to generate")
+    group.add_argument("-in", "--input", type=str, help="choose input data file path")
+    parser.add_argument("-out", "--output", type=str, help="choose output file path")
+    parser.add_argument("-k", type=int, help="choose how many problems to generate")
+    parser.add_argument("-s", "--step", type=int, help="choose step value")
+    parser.add_argument("-r", type=int, default=1, help="choose how many instances of a problem to generate")
+    args = parser.parse_args()
+
+    if args.mode == 1:
+        print("Mode 1")
+        # read data from file and save output to file
+        if args.input is None or args.output is None:
+            try:
+                raise UnspecifiedArgumentException()
+            except UnspecifiedArgumentException as e:
+                print(e)
+                exit(1)
+        print(f"Program will solve 1 problem from {args.input} and save it to {args.output}.")
+        return [args.mode, args.input, args.output]
+    elif args.mode == 2:
+        print("Mode 2")
         # generating and solving 1 problem of size n
-        n = int(sys.argv[2][2:])
+        if args.number is None or args.output is None:
+            try:
+                raise UnspecifiedArgumentException()
+            except UnspecifiedArgumentException as e:
+                print(e)
+                exit(1)
+        n = args.number
         if n > 10000:
             n = 10000
-        a_list = generate_problem_data(n)
-        return [program_mode, a_list, n]
-    elif program_mode == 3:
-        # generating and solving k problems, r of same size n+k*step, in total k*r problems
-        n = int(sys.argv[2][2:])
-        k = int(sys.argv[3][2:])
-        step = int(sys.argv[4][2:])
-        r = int(sys.argv[5][2:])
-        a_list = generate_problem_instances(k, n, step, r)
-        return [program_mode, a_list, n, k, step, r]
-    elif program_mode == 1:
-        # read data from file and save output to file
-        input_path = sys.argv[2]
-        output_path = sys.argv[3]
-        a_list = read_data_from_file(input_path)
-        return [program_mode, a_list, output_path]
+        print(f"Program will generate and solve 1 problem of size {n} and save it to {args.output}.")
+        return [args.mode, n, args.output]
     else:
-        print("Program mode not supported")
+        print("Mode 3")
+        # generating and solving k problems, r of same size n+k*step, in total k*r problems
+        if args.number is None or args.step is None or args.k is None or args.r is None:
+            try:
+                raise UnspecifiedArgumentException()
+            except UnspecifiedArgumentException as e:
+                print(e)
+                exit(1)
+        n = args.number
+        if n > 10000:
+            n = 10000
+        k = args.k
+        if k <= 0:
+            k = 1
+        step = args.step
+        while n + k * step > 10000:
+            step -= 100
+        if step < 0:
+            step = 0
+        r = args.r
+        if r <= 0:
+            r = 1
+        print(f"Program will solve {r} instances of {k} problems with starting value of {n} with step {step}.")
+        return [args.mode, k, n, step, r]
 
 
 if __name__ == '__main__':
+
     sys.setrecursionlimit(10001)
     random.seed()
-    # program_parameters = read_passed_arguments()
-    start = time.time()
-    a_list = generate_special_problem_data()
+    program_parameters = read_passed_arguments()
+
+    # a_list = generator.generate_special_problem_data(5000, True)
+    # a_list = generator.generate_problem_data(100)
     # a_list = [[0, 3], [0, 4], [1, 8], [8, 20], [0, 35], [4, 36]]
-    end = time.time()
-    print('Problem generation duration ' + str(end - start))
-    print(a_list)
-    # a_list = generate_problem_instances(5, 2, 1, 2)
-    # a_list = read_data_from_file()
 
-    start = time.time()
-    graph = graph.Graph(a_list)
-    end = time.time()
-    print('Add vertices to graph duration ' + str(end - start))
+    if program_parameters[0] == 1 or program_parameters[0] == 2:
+        start = time.time()
+        if program_parameters[0] == 1:
+            a_list = generator.read_data_from_file(program_parameters[1])
+        else:
+            a_list = generator.generate_problem_data(program_parameters[1])
+        end = time.time()
+        time_data = [start, end]
+        print('Problem generation duration ' + str(end - start))
 
-    start = time.time()
-    graph.generate_edges()
-    end = time.time()
-    print('Add edges duration ' + str(end - start))
+        start = time.time()
+        graph = graph.Graph(a_list)
+        end = time.time()
+        time_data.append(start)
+        time_data.append(end)
+        print('Add vertices to graph duration ' + str(end - start))
 
-    # print(a_list)
-    # print(graph)
-    start = time.time()
-    graph.topological_sort()
-    end = time.time()
-    print('Topological sort duration ' + str(end - start))
-    # print(graph)
+        start = time.time()
+        graph.generate_edges()
+        end = time.time()
+        time_data.append(start)
+        time_data.append(end)
+        print('Add edges duration ' + str(end - start))
 
-    start = time.time()
-    output = graph.max_path()
-    end = time.time()
-    print('Path sort duration ' + str(end - start))
-    print('Total airtime: ' + str(output[0]))
-    output = output[1:]
-    output.reverse()
-    print(output)
-    # print(graph)
-    write_data_to_file(a_list)
-    write_solution_to_file(a_list, 500, 100)
+        # print(a_list)
+        # print(graph)
+        start = time.time()
+        graph.topological_sort()
+        end = time.time()
+        time_data.append(start)
+        time_data.append(end)
+        print('Topological sort duration ' + str(end - start))
+        # print(graph)
+
+        start = time.time()
+        output = graph.max_path()
+        end = time.time()
+        time_data.append(start)
+        time_data.append(end)
+        print('Path sort duration ' + str(end - start))
+        print('Total plane airtime: ' + str(output[0]))
+        print('Total calculation time: ' + str(time_data[9] - time_data[0]))
+        total_airtime = output[0]
+        output = output[1:]
+        output.reverse()
+        print(output)
+
+        if program_parameters[0] == 2:
+            generator.write_data_to_file(a_list)
+        write_solution_to_file(output, total_airtime, time_data, program_parameters[2])
+
+    else:
+        table = BeautifulTable(200)
+        # i problems
+        for i in range(program_parameters[1]):
+            # j instances
+            for j in range(program_parameters[4]):
+                start = time.time()
+                a_list = generator.generate_problem_data(program_parameters[2] + i * program_parameters[3])
+                # a_list = generator.generate_special_problem_data(program_parameters[2] + i*program_parameters[3], True)
+                end = time.time()
+                time_data = [start, end]
+                print('Problem generation duration ' + str(end - start))
+
+                print(f"Number of flights: {len(a_list)}")
+                start = time.time()
+                a_graph = graph.Graph(a_list)
+                end = time.time()
+                time_data.append(start)
+                time_data.append(end)
+                print('Add vertices to graph duration ' + str(end - start))
+
+                start = time.time()
+                a_graph.generate_edges()
+                end = time.time()
+                time_data.append(start)
+                time_data.append(end)
+                print('Add edges duration ' + str(end - start))
+
+                start = time.time()
+                a_graph.topological_sort()
+                end = time.time()
+                time_data.append(start)
+                time_data.append(end)
+                print('Topological sort duration ' + str(end - start))
+
+                start = time.time()
+                output = a_graph.max_path()
+                end = time.time()
+                time_data.append(start)
+                time_data.append(end)
+                print('Path sort duration ' + str(end - start))
+                print('Total plane airtime: ' + str(output[0]))
+                print('Total calculation time: ' + str(time_data[9] - time_data[0]) + '\nSolution: ')
+                total_airtime = output[0]
+                output = output[1:]
+                output.reverse()
+                print(output)
+
+                row = [program_parameters[2] + i * program_parameters[3], j + 1, total_airtime,
+                       time_data[9] - time_data[0], time_data[1] - time_data[0],
+                       time_data[3] - time_data[2], time_data[5] - time_data[4], time_data[7] - time_data[6],
+                       time_data[9] - time_data[8]]
+                table.rows.append(row)
+
+            row = [program_parameters[2] + i * program_parameters[3], "average", 0, 0, 0, 0, 0, 0, 0]
+            for r in range(2, 8):
+                avg = list(table.columns[r])
+                avg = avg[-program_parameters[4]:]
+                row[r] = sum(avg) / program_parameters[4]
+            table.rows.append(row)
+
+        h0 = ["Problem size", "Instance", "Total airtime", "Total calculation time", "Data generation time",
+              "Add vertices duration", "Add edges duration", "Topological sort duration", "Path finding duration"]
+        table.columns.header = h0
+        table.precision = 10
+
+        print(table)
+
+        file = open("table.txt", "w")
+        file.write(str(table))
+        file.close()
