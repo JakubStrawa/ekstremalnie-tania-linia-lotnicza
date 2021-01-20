@@ -1,13 +1,12 @@
-Total time in air: 29942
-Total time of calculating solution: 3.429136037826538
-Problem generation duration 0.0057888031005859375
-Add vertices to graph duration 0.0044138431549072266
-Add edges duration 2.819037914276123
-Topological sort duration 0.19332623481750488
-Path sort duration 0.4064810276031494
+Total time in air: 29876
+Total time of calculating solution: 0.22322320938110352
+Problem generation duration 0.002001047134399414
+Add vertices to graph duration 0.0010018348693847656
+Add edges duration 0.17917943000793457
+Topological sort duration 0.01401376724243164
+Path sort duration 0.027027130126953125
 Flights in order: 
-15,26255
-26274,28675
-28681,29887
-29895,29958
-29961,29993
+16,28818
+28838,29331
+29344,29723
+29753,29955

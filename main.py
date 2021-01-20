@@ -4,6 +4,7 @@ import graph
 import time
 import generator
 import argparse
+import gc
 from beautifultable import BeautifulTable
 
 
@@ -116,45 +117,45 @@ if __name__ == '__main__':
     # a_list = [[0, 3], [0, 4], [1, 8], [8, 20], [0, 35], [4, 36]]
 
     if program_parameters[0] == 1 or program_parameters[0] == 2:
-        start = time.time()
+        start = time.perf_counter()
         if program_parameters[0] == 1:
             a_list = generator.read_data_from_file(program_parameters[1])
         else:
             a_list = generator.generate_problem_data(program_parameters[1])
-        end = time.time()
+        end = time.perf_counter()
         time_data = [start, end]
         print('Problem generation duration ' + str(end - start))
 
-        start = time.time()
+        start = time.perf_counter()
         graph = graph.Graph(a_list)
-        end = time.time()
+        end = time.perf_counter()
         time_data.append(start)
         time_data.append(end)
         print('Add vertices to graph duration ' + str(end - start))
 
-        start = time.time()
+        start = time.perf_counter()
         graph.generate_edges()
-        end = time.time()
+        end = time.perf_counter()
         time_data.append(start)
         time_data.append(end)
         print('Add edges duration ' + str(end - start))
 
         # print(a_list)
         # print(graph)
-        start = time.time()
+        start = time.perf_counter()
         graph.topological_sort()
-        end = time.time()
+        end = time.perf_counter()
         time_data.append(start)
         time_data.append(end)
         print('Topological sort duration ' + str(end - start))
         # print(graph)
 
-        start = time.time()
+        start = time.perf_counter()
         output = graph.max_path()
-        end = time.time()
+        end = time.perf_counter()
         time_data.append(start)
         time_data.append(end)
-        print('Path sort duration ' + str(end - start))
+        print('Path finding duration ' + str(end - start))
         print('Total plane airtime: ' + str(output[0]))
         print('Total calculation time: ' + str(time_data[9] - time_data[0]))
         total_airtime = output[0]
@@ -172,41 +173,41 @@ if __name__ == '__main__':
         for i in range(program_parameters[1]):
             # j instances
             for j in range(program_parameters[4]):
-                start = time.time()
+                start = time.perf_counter()
                 a_list = generator.generate_problem_data(program_parameters[2] + i * program_parameters[3])
                 # a_list = generator.generate_special_problem_data(program_parameters[2] + i*program_parameters[3], True)
-                end = time.time()
+                end = time.perf_counter()
                 time_data = [start, end]
                 print('Problem generation duration ' + str(end - start))
 
                 print(f"Number of flights: {len(a_list)}")
-                start = time.time()
+                start = time.perf_counter()
                 a_graph = graph.Graph(a_list)
-                end = time.time()
+                end = time.perf_counter()
                 time_data.append(start)
                 time_data.append(end)
                 print('Add vertices to graph duration ' + str(end - start))
 
-                start = time.time()
+                start = time.perf_counter()
                 a_graph.generate_edges()
-                end = time.time()
+                end = time.perf_counter()
                 time_data.append(start)
                 time_data.append(end)
                 print('Add edges duration ' + str(end - start))
 
-                start = time.time()
+                start = time.perf_counter()
                 a_graph.topological_sort()
-                end = time.time()
+                end = time.perf_counter()
                 time_data.append(start)
                 time_data.append(end)
                 print('Topological sort duration ' + str(end - start))
 
-                start = time.time()
+                start = time.perf_counter()
                 output = a_graph.max_path()
-                end = time.time()
+                end = time.perf_counter()
                 time_data.append(start)
                 time_data.append(end)
-                print('Path sort duration ' + str(end - start))
+                print('Path finding duration ' + str(end - start))
                 print('Total plane airtime: ' + str(output[0]))
                 print('Total calculation time: ' + str(time_data[9] - time_data[0]) + '\nSolution: ')
                 total_airtime = output[0]
@@ -220,12 +221,15 @@ if __name__ == '__main__':
                        time_data[9] - time_data[8]]
                 table.rows.append(row)
 
+                gc.collect()
+
             row = [program_parameters[2] + i * program_parameters[3], "average", 0, 0, 0, 0, 0, 0, 0]
-            for r in range(2, 8):
+            for r in range(2, 9):
                 avg = list(table.columns[r])
                 avg = avg[-program_parameters[4]:]
                 row[r] = sum(avg) / program_parameters[4]
             table.rows.append(row)
+
 
         h0 = ["Problem size", "Instance", "Total airtime", "Total calculation time", "Data generation time",
               "Add vertices duration", "Add edges duration", "Topological sort duration", "Path finding duration"]

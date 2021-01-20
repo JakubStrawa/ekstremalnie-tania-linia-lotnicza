@@ -3,11 +3,11 @@ import vertex
 
 class Graph:
     def __init__(self, flights):
-        self.vertices = list(range(len(flights)))
+        self.vertices = []
         number = 0
-        for i in range(len(flights)):
+        for flight in flights:
             number += 1
-            self.vertices[i] = vertex.Vertex(number, flights[i][0], flights[i][1])
+            self.vertices.append(vertex.Vertex(number, flight[0], flight[1]))
 
     def generate_edges(self):
         for i in range(len(self.vertices)):

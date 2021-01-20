@@ -1,6 +1,3 @@
-import edge
-
-
 class Vertex:
     def __init__(self, number, departure, arrival):
         self.number = number
