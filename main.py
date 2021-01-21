@@ -1,3 +1,4 @@
+# Maciej Dmowski, Jakub Strawa - ekstremalnie tania linia lotnicza
 import random
 import sys
 import graph
@@ -175,7 +176,7 @@ if __name__ == '__main__':
             for j in range(program_parameters[4]):
                 start = time.perf_counter()
                 a_list = generator.generate_problem_data(program_parameters[2] + i * program_parameters[3])
-                # a_list = generator.generate_special_problem_data(program_parameters[2] + i*program_parameters[3], True)
+                #a_list = generator.generate_special_problem_data(program_parameters[2] + i*program_parameters[3], False)
                 end = time.perf_counter()
                 time_data = [start, end]
                 print('Problem generation duration ' + str(end - start))
@@ -218,23 +219,36 @@ if __name__ == '__main__':
                 row = [program_parameters[2] + i * program_parameters[3], j + 1, total_airtime,
                        time_data[9] - time_data[0], time_data[1] - time_data[0],
                        time_data[3] - time_data[2], time_data[5] - time_data[4], time_data[7] - time_data[6],
-                       time_data[9] - time_data[8]]
+                       time_data[9] - time_data[8], 0]
                 table.rows.append(row)
 
                 gc.collect()
 
-            row = [program_parameters[2] + i * program_parameters[3], "average", 0, 0, 0, 0, 0, 0, 0]
+            row = [program_parameters[2] + i * program_parameters[3], "average", 0, 0, 0, 0, 0, 0, 0, 0]
             for r in range(2, 9):
                 avg = list(table.columns[r])
                 avg = avg[-program_parameters[4]:]
                 row[r] = sum(avg) / program_parameters[4]
             table.rows.append(row)
 
-
-        h0 = ["Problem size", "Instance", "Total airtime", "Total calculation time", "Data generation time",
-              "Add vertices duration", "Add edges duration", "Topological sort duration", "Path finding duration"]
+        h0 = ["Problem size", "Instance", "Tot. airtime", "Tot. calculation time", "Data generation time",
+              "Add vertices time", "Add edges time", "Topological sort time", "Path finding time", "q(n)"]
         table.columns.header = h0
         table.precision = 10
+        avg_rows = []
+        for i in range(program_parameters[4], (program_parameters[4]+1) * program_parameters[1], program_parameters[4]+1):
+            avg_rows += list(table.rows[i][0:1])
+            avg_rows += list(table.rows[i][3:4])
+        # calculating q(n)
+        # q(n median) = 1.0, so T(n median) = t(n median)
+        if len(avg_rows)/2 % 2 == 0:
+            refrence_val = [avg_rows[len(avg_rows)//2], avg_rows[len(avg_rows)//2 + 1]]
+        else:
+            refrence_val = [avg_rows[len(avg_rows)//2 - 1], avg_rows[len(avg_rows)//2]]
+        print(refrence_val)
+
+        for r in table.rows:
+            r[9] = r[3] / ((r[0]/refrence_val[0])*(r[0]/refrence_val[0])*refrence_val[1])
 
         print(table)
 

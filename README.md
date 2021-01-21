@@ -11,7 +11,7 @@ Dla uproszczenia przyjmujemy, iż zamówienia określać będą jedynie moment w
 
 
 ## Opis problemu
-#### Projekt napisany w języku Python
+#### Projekt napisany w języku Python 3.8
 Posiadamy maksymalnie 10000 lotów opisanych czasami wylotu i przylotu. Celem naszego algorytmu jest uzyskanie jak największej zajętości czasowej - czasu pobytu samolotu w powietrzu dla przedziału 0 – 30000 liczonego w minutach. Uzyskamy dzięki temu plan lotów na prawie 21 dni zakładając, że 1 jednostka czasowa to 1 minuta.
 
 ## Założenia
@@ -65,6 +65,10 @@ Dla trybu 3(-m 3) do pliku zapisywane są następujące dane:
 - porównanie z założoną żłożonością obliczeniową
 
 ## Sposób działania
+0. Do poprawnego działania program wymaga ściągnięcia biblioteki Beautiful Table:
+     ```
+     pip install beautifultable
+     ```
 1. Pobranie danych wejściowych z pliku i wypisanie rozwiązania do pliku: 
      ```
      python main.py –m 1 -in data.txt -out result.txt
@@ -75,7 +79,7 @@ Dla trybu 3(-m 3) do pliku zapisywane są następujące dane:
      ```
 3. Przeprowadzenie całego procesu testowania z pomiarem czasu dla rosnącego o s(tep) n i porównaniem ze złożonością teoretyczną: 
      ```
-     python main.py -m 3 -n 1000 –k 30 –s 500 –r 10
+     python main.py -m 3 -n 1000 –s 500 -k 30 –r 10
      ```
     Pomiar czasu dla k problemów o wielkościach n, n+step, n+2*step itd. Dla każdej wielkości losowanych r instancji problemu.
 4. Uzyskanie prostej pomocy co do flag:

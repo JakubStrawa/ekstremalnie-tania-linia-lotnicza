@@ -1,3 +1,4 @@
+# Maciej Dmowski, Jakub Strawa - ekstremalnie tania linia lotnicza
 class Vertex:
     def __init__(self, number, departure, arrival):
         self.number = number

@@ -1,3 +1,4 @@
+# Maciej Dmowski, Jakub Strawa - ekstremalnie tania linia lotnicza
 import vertex
 
 
