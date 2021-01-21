@@ -58,6 +58,27 @@ Na początku sortujemy dane według rosnących godzin wylotów. Następnie, gene
 * vertex.py -  plik w którym realizowana jest struktura wierzchołka grafu
 * edge.py - plik w którym realizowana jest struktura krawędzi grafu
 
+### Opis struktur oraz funkcji
+**Klasa Vertex** — reprezentuje pojedynczy wierzchołek grafu — lot o określonym czasie rozpoczęcia i zakończenia.
+
+Zawiera zbiory wierzchołków:
+- poprzedników — wierzchołki, od których krawędzie prowadzą do wierzchołka
+- następników — wierzchołki, do których prowadzą krawędzie zaczynające się w tym wierzchołku
+
+W celu wyliczenia najdłuższej ścieżki w grafie dodatkowo zawiera:
+- wartość logiczną czy wierzchołek został odwiedzony — wykorzystywane w sortowaniu topologicznym
+- koszt najdłuższej ścieżki kończącej się w tym wierzchołku
+- poprzedni wierzchołek z najdłuższej ścieżki
+
+**Klasa Graph** - przechowuje wszystkie wierzchołki stanowiące graf, tworzy je na podstawie otrzymanej listy lotów oraz tworzy między nimi krawędzie.
+
+*Metoda topological_sort* — dokonuje sortowania topologicznego wierzchołków w grafie metodą DFS.
+
+*Metoda max_path* — zwraca najdłuższą ścieżkę w grafie (największa suma długości krawędzi).
+Przechodząc po tablicy wierzchołków posortowanej topologicznie, zapisywana jest najdłuższa ścieżka kończąca się w danym wierzchołku. Najdłuższa osiągnięta ścieżka jest zwracana jako wynik działania funkcji w postaci tablicy zawierającej łączny czas w powietrzu oraz loty, które należy wybrać.
+
+
+
 ### Ocena złożoności algorytmu
 Ze wstępnych obliczeń wynikało, że generowanie grafu ma złożoność czasową n^2, a przeszukiwanie: liniową lub V+E, więc łącznie złożoność czasowa i tak wyniesie n^2.
 Z przeprowadzonych analiz wynika, że teoretyczna, obliczona przez nas złożoność praktycznie nie odbiera od tej faktycznej, zmierzonej.
@@ -100,7 +121,7 @@ Dla trybu 3(-m 3) do pliku zapisywane są następujące dane:
      ```
 3. Przeprowadzenie całego procesu testowania z pomiarem czasu dla rosnącego o s(tep) n i porównaniem ze złożonością teoretyczną: 
      ```
-     python main.py -m 3 -n 1000 –s 500 -k 30 –r 10
+     python main.py -m 3 -n 1000 -s 500 -k 10 -r 5
      ```
     Pomiar czasu dla k problemów o wielkościach n, n+step, n+2*step itd. Dla każdej wielkości losowanych r instancji problemu.
 4. Uzyskanie prostej pomocy co do flag:
