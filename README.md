@@ -66,9 +66,6 @@ W celu analizy złożoności algorytmu przeprowadziliśmy kilka uruchomień prog
 ### Wnioski
 
 
-### Wnioski uczestników
-Maciej Dmowski - 
-Jakub Strawa - 
 
 ## Dane wynikowe
 Dla trybu 1(-m 1) do pliku zapisywane są następujące dane:
