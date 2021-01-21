@@ -113,10 +113,6 @@ if __name__ == '__main__':
     random.seed()
     program_parameters = read_passed_arguments()
 
-    # a_list = generator.generate_special_problem_data(5000, True)
-    # a_list = generator.generate_problem_data(100)
-    # a_list = [[0, 3], [0, 4], [1, 8], [8, 20], [0, 35], [4, 36]]
-
     if program_parameters[0] == 1 or program_parameters[0] == 2:
         start = time.perf_counter()
         if program_parameters[0] == 1:
@@ -141,15 +137,12 @@ if __name__ == '__main__':
         time_data.append(end)
         print('Add edges duration ' + str(end - start))
 
-        # print(a_list)
-        # print(graph)
         start = time.perf_counter()
         graph.topological_sort()
         end = time.perf_counter()
         time_data.append(start)
         time_data.append(end)
         print('Topological sort duration ' + str(end - start))
-        # print(graph)
 
         start = time.perf_counter()
         output = graph.max_path()
@@ -251,6 +244,8 @@ if __name__ == '__main__':
             r[9] = r[3] / ((r[0]/refrence_val[0])*(r[0]/refrence_val[0])*refrence_val[1])
 
         print(table)
+        print(table.columns[3])
+        print(table.columns[9])
 
         file = open("table.txt", "w")
         file.write(str(table))
