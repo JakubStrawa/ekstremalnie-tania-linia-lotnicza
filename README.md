@@ -45,7 +45,7 @@ W zależności od potrzeb zmieniane będą parametry generacji, np. generacja lo
 ### Opis algorytmu
 Na początku sortujemy dane według rosnących godzin wylotów. Następnie, generujemy graf skierowany ważony. Wierzchołek startowy: 0, połączony jest ze wszystkimi lotami. Każdy lot połączony jest z każdym możliwym następnym lotem - przylot lotu poprzedniego <= wylot lotu następnego. Krawędzie wychodzące z wierzchołka mają wagi odpowiadające długości lotu tego wierzchołka. Ostatni wierzchołek jest punktem końcowym porządkowania - minuta: 30.000, do którego wchodzą krawędzie z wierzchołków każdego z lotów. Następnie wyszukujemy ścieżkę o największym koszcie w grafie, dzięki czemu otrzymujemy największy sumaryczny czas w powietrzu.
 
-![Przykładowy graf](https://codimd.s3.shivering-isles.com/demo/uploads/upload_13ea6cff1295fc308ec3aca6fea71a18.png)
+![Przykładowy graf](graph.png)
 
 
 ### Opis plików źródłowych
